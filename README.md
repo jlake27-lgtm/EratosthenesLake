@@ -26,6 +26,8 @@ automatically and shown as a worksheet.
     measured with both the north–south and straight-line distance.
 - Shareable links (the URL stores the date and both cities), light and dark themes, works on phones.
 
+**Live site:** https://jlake27-lgtm.github.io/EratosthenesLake/
+
 ## Running it
 
 Requires [Node.js](https://nodejs.org) 22.12 or newer.
@@ -46,6 +48,15 @@ npm run build      # static site in dist/ — upload anywhere (GitHub Pages, Net
 npm run preview    # serve the built site locally
 npm run cities     # rebuild public/data/cities.json from data-src/
 ```
+
+## Deploying
+
+Every push to `main` runs `.github/workflows/deploy.yml`, which installs dependencies, runs the tests, builds
+the site, and publishes `dist/` to GitHub Pages. If the tests fail, nothing is deployed. The workflow can also be
+run by hand from the repository's **Actions** tab (*Deploy to GitHub Pages* → *Run workflow*).
+
+One-time setup (already done for this repository): **Settings → Pages → Build and deployment → Source:
+GitHub Actions**.
 
 ## How the calculation works
 
