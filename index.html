@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Measure the circumference of the Earth with Eratosthenes' method using any two cities roughly north–south of each other." />
+    <title>Eratosthenes Simulator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☀️</text></svg>" />
+  </head>
+  <body>
+    <header class="site-header">
+      <h1>Eratosthenes Simulator</h1>
+      <p class="lede">
+        Pick two cities roughly north–south of each other. The Sun's noon altitude in each city and the distance
+        between them give you the circumference of the Earth.
+      </p>
+    </header>
+
+    <main>
+      <section class="controls card">
+        <label class="field">
+          <span>Date</span>
+          <input type="date" id="date" />
+        </label>
+        <label class="field check">
+          <input type="checkbox" id="refraction" checked />
+          <span>Atmosphere on <small>(Stellarium's "A" key; adds refraction)</small></span>
+        </label>
+        <fieldset class="field">
+          <legend>Distance to use</legend>
+          <label class="check"><input type="radio" name="distMode" value="ns" checked /> North–south only <small>(recommended)</small></label>
+          <label class="check"><input type="radio" name="distMode" value="straight" /> Straight line <small>(like Google Maps)</small></label>
+        </fieldset>
+      </section>
+
+      <section class="cities">
+        <div class="card city" data-slot="a">
+          <h2><span class="dot a"></span> City A</h2>
+          <div class="search">
+            <input type="search" placeholder="Search for a city…" autocomplete="off" aria-label="City A" />
+            <ul class="results" role="listbox" hidden></ul>
+          </div>
+          <div class="city-info"></div>
+        </div>
+
+        <div class="card city" data-slot="b">
+          <h2><span class="dot b"></span> City B</h2>
+          <div class="search">
+            <input type="search" placeholder="Search for a city…" autocomplete="off" aria-label="City B" />
+            <ul class="results" role="listbox" hidden></ul>
+          </div>
+          <div class="city-info"></div>
+
+          <details class="suggest" open>
+            <summary>Suggested partners for City A</summary>
+            <div class="suggest-filters">
+              <label>Max Δ longitude
+                <select id="maxDLon">
+                  <option value="0.5">0.5°</option>
+                  <option value="1" selected>1°</option>
+                  <option value="2">2°</option>
+                  <option value="3">3°</option>
+                </select>
+              </label>
+              <label>Min population
+                <select id="minPop">
+                  <option value="0">any</option>
+                  <option value="10">10k</option>
+                  <option value="50" selected>50k</option>
+                  <option value="250">250k</option>
+                  <option value="1000">1M</option>
+                </select>
+              </label>
+              <label class="check"><input type="checkbox" id="sameTz" checked /> Same time zone</label>
+            </div>
+            <ul class="suggest-list"></ul>
+          </details>
+        </div>
+      </section>
+
+      <div class="actions">
+        <button type="button" id="calculate" class="primary" disabled>Calculate circumference</button>
+      </div>
+
+      <section class="card map-card">
+        <div id="map"></div>
+      </section>
+
+      <section class="card" id="results">
+        <p class="placeholder">Choose two cities to see the measurement.</p>
+      </section>
+
+      <div id="charts">
+        <section class="card">
+          <div class="chart-head">
+            <h2>Your trials <span class="count" id="trials-count"></span></h2>
+            <div class="chart-controls">
+              <div class="segmented" role="radiogroup" aria-label="Horizontal axis">
+                <label><input type="radio" name="trialsX" value="lon" checked /><span>Δ longitude</span></label>
+                <label><input type="radio" name="trialsX" value="distance" /><span>Distance</span></label>
+              </div>
+              <button type="button" id="clear-trials" class="secondary" disabled>Clear</button>
+            </div>
+          </div>
+          <p class="caption">Each time you press Calculate, the result is added here. Compare your trials with the reference charts below.</p>
+          <div id="trials-chart"></div>
+          <details id="trials-table" hidden>
+            <summary>Trials table</summary>
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead><tr><th>#</th><th>Cities</th><th>Date</th><th>Δ lon</th><th>Distance</th><th>Method</th><th>Atmosphere</th><th>Circumference</th><th>Error</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </details>
+        </section>
+
+        <div class="ref-grid">
+          <section class="card">
+            <h2>Reference: accuracy vs. longitude difference</h2>
+            <p class="caption" id="ref-lon-caption">Computing reference pairs…</p>
+            <div class="ref-chart" id="ref-lon-chart"></div>
+          </section>
+          <section class="card">
+            <h2>Reference: accuracy vs. distance apart</h2>
+            <p class="caption" id="ref-dist-caption">Computing reference pairs…</p>
+            <div class="ref-chart" id="ref-dist-chart"></div>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      City list from <a href="https://stellarium.org">Stellarium</a> (GeoNames data, CC-BY 4.0).
+      Sun positions by <a href="https://github.com/cosinekitty/astronomy">Astronomy Engine</a>.
+      Distances by <a href="https://geographiclib.sourceforge.io/">GeographicLib</a> on the WGS84 ellipsoid.
+    </footer>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
