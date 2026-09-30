@@ -1,0 +1,1016 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EratosthenesLake · Showcase</title>
+<meta name="description" content="Measure the circumference of the Earth with Eratosthenes' method using any two cities roughly north–south of each other." />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='22' fill='%23d69a2d'/><g stroke='%23d69a2d' stroke-width='7' stroke-linecap='round'><path d='M50 6v12M50 82v12M6 50h12M82 50h12M19 19l8 8M73 73l8 8M19 81l8-8M73 27l8-8'/></g></svg>" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" />
+<style>
+:root {
+  --bg: #f6f1e7;
+  --surface: #fffaf0;
+  --sunken: #eee5d3;
+  --ink: #1e1b16;
+  --muted: #5a5244;
+  --line: #d9ccb3;
+  --accent: #8a5a0b;
+  --accent-ink: #fffaf0;
+  --accent-soft: rgba(138, 90, 11, 0.10);
+  --shade: rgba(30, 27, 22, 0.08);
+  --stars: none;
+  --display: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --body: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+  --radius: 10px;
+  --measure: 68ch;
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0c1120;
+    --surface: #131a2c;
+    --sunken: #1a2338;
+    --ink: #ebe6da;
+    --muted: #a9a394;
+    --line: #2b3552;
+    --accent: #f0b451;
+    --accent-ink: #0c1120;
+    --accent-soft: rgba(240, 180, 81, 0.12);
+    --shade: rgba(0, 0, 0, 0.35);
+    --stars:
+      radial-gradient(1px 1px at 20px 30px, rgba(255,255,255,.55) 50%, transparent 51%),
+      radial-gradient(1px 1px at 130px 80px, rgba(255,255,255,.35) 50%, transparent 51%),
+      radial-gradient(1.4px 1.4px at 70px 160px, rgba(255,240,210,.5) 50%, transparent 51%),
+      radial-gradient(1px 1px at 190px 190px, rgba(255,255,255,.3) 50%, transparent 51%),
+      radial-gradient(1px 1px at 240px 40px, rgba(255,255,255,.4) 50%, transparent 51%);
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 72px; }
+body {
+  margin: 0;
+  background-color: var(--bg);
+  background-image: var(--stars);
+  background-size: 260px 220px;
+  color: var(--ink);
+  font: 400 17px/1.65 var(--body);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+h1, h2, h3 { font-family: var(--display); font-weight: 600; line-height: 1.15; letter-spacing: -0.01em; margin: 0 0 .5em; }
+h2 { font-size: clamp(1.8rem, 3.6vw, 2.6rem); }
+h3 { font-size: 1.25rem; }
+p { margin: 0 0 1em; max-width: var(--measure); }
+a { color: var(--accent); text-underline-offset: 3px; }
+a:hover { text-decoration-thickness: 2px; }
+code, .mono { font-family: var(--mono); font-size: .92em; font-variant-numeric: tabular-nums; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+.skip { position: absolute; left: -999px; top: 8px; background: var(--surface); padding: 8px 12px; z-index: 100; }
+.skip:focus { left: 8px; }
+.wrap { max-width: 1160px; margin: 0 auto; padding: 0 16px; }
+.hero-grid > *, .two > *, .demo > *, .code-item > *, .foot-grid > *, .steps > * { min-width: 0; }
+@media (min-width: 700px) { .wrap { padding: 0 32px; } }
+
+/* ---------- nav ---------- */
+.topnav {
+  position: sticky; top: 0; z-index: 50;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+.topnav .wrap { display: flex; align-items: center; gap: 20px; height: 56px; }
+.brand { font-family: var(--display); font-weight: 700; color: var(--ink); text-decoration: none; white-space: nowrap; display: flex; align-items: center; gap: 8px; }
+.brand svg { width: 22px; height: 22px; color: var(--accent); }
+.topnav ul { list-style: none; margin: 0; padding: 0; display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; flex: 1; }
+.topnav ul::-webkit-scrollbar { display: none; }
+.topnav a.nl { display: block; padding: 6px 10px; border-radius: 999px; color: var(--muted); text-decoration: none; font-size: .9rem; white-space: nowrap; transition: color .15s, background .15s; }
+.topnav a.nl:hover, .topnav a.nl[aria-current="true"] { color: var(--ink); background: var(--accent-soft); }
+
+/* ---------- hero ---------- */
+.hero { padding: 72px 0 64px; border-bottom: 1px solid var(--line); position: relative; overflow: hidden; }
+.hero-grid { display: grid; gap: 40px; align-items: center; }
+@media (min-width: 900px) { .hero-grid { grid-template-columns: 1.25fr 1fr; } }
+.kicker { font: 500 .8rem/1 var(--mono); text-transform: uppercase; letter-spacing: .12em; color: var(--accent); margin-bottom: 18px; }
+.hero h1 { font-size: clamp(2.5rem, 6.4vw, 4.4rem); margin-bottom: 18px; }
+.hero .lede { font-size: 1.2rem; color: var(--muted); }
+.hero .lede strong { color: var(--ink); font-weight: 500; }
+.cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+.btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 18px; border-radius: 999px; font-weight: 500; text-decoration: none; border: 1px solid var(--accent); transition: transform .15s, background .15s; }
+.btn.primary { background: var(--accent); color: var(--accent-ink); }
+.btn.ghost { color: var(--accent); }
+.btn:hover { transform: translateY(-2px); }
+.result-card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 28px; box-shadow: 0 20px 50px -30px rgba(0,0,0,.35); }
+.result-card .label { font-size: .85rem; color: var(--muted); }
+.big { font-family: var(--display); font-size: clamp(3rem, 9vw, 4.6rem); font-weight: 700; line-height: 1; color: var(--accent); margin: 10px 0 6px; font-variant-numeric: tabular-nums; }
+.big small { font-size: .4em; color: var(--ink); font-weight: 600; }
+.result-card .eq { font-family: var(--mono); font-size: .95rem; background: var(--sunken); padding: 10px 12px; border-radius: 8px; margin: 16px 0 12px; overflow-x: auto; }
+.pill { display: inline-block; font: 500 .8rem/1 var(--mono); padding: 6px 10px; border-radius: 999px; background: var(--accent-soft); color: var(--ink); margin: 2px 4px 2px 0; }
+
+/* ---------- sections ---------- */
+section.block { padding: 88px 0; border-bottom: 1px solid var(--line); }
+section.block.alt { background: color-mix(in srgb, var(--surface) 60%, transparent); }
+.eyebrow { font: 500 .8rem/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; display: block; }
+.section-intro { font-size: 1.1rem; color: var(--muted); }
+.two { display: grid; gap: 40px; }
+@media (min-width: 900px) { .two { grid-template-columns: 1fr 1fr; align-items: start; } .two.wide-right { grid-template-columns: 1fr 1.2fr; } }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; }
+.handlist { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+.handlist li { display: grid; grid-template-columns: 32px 1fr; gap: 12px; align-items: start; }
+.handlist .n { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); font: 600 .85rem var(--mono); }
+
+/* steps */
+.steps { counter-reset: s; display: grid; gap: 18px; margin-top: 36px; }
+@media (min-width: 800px) { .steps { grid-template-columns: repeat(2, 1fr); } }
+.step { position: relative; padding-top: 26px; }
+.step::before { counter-increment: s; content: counter(s); position: absolute; top: -16px; left: 22px; width: 34px; height: 34px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font: 600 .95rem var(--mono); }
+.step p { font-size: .98rem; }
+.math { overflow-x: auto; overflow-y: hidden; padding: 6px 0; font-size: 1.05rem; }
+.vars { width: 100%; border-collapse: collapse; font-size: .95rem; margin-top: 8px; }
+.vars th, .vars td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.vars code { overflow-wrap: anywhere; }
+.vars td.v { font-family: var(--mono); color: var(--accent); }
+@media (min-width: 600px) { .vars td.v { white-space: nowrap; } }
+.table-wrap { overflow-x: auto; }
+
+/* diagram */
+.diagram-fig { margin: 0; }
+.diagram-fig svg { width: 100%; height: auto; display: block; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; }
+.diagram-fig figcaption { font-size: .88rem; color: var(--muted); margin-top: 10px; }
+svg .earth { fill: var(--sunken); stroke: var(--muted); stroke-width: 1.5; }
+svg .night { fill: var(--shade); }
+svg .equator { stroke: var(--muted); stroke-dasharray: 3 5; stroke-width: 1; }
+svg .ray { stroke: var(--accent); stroke-width: 1.6; }
+svg .ray.faint { opacity: .35; }
+svg .radius { stroke: var(--muted); stroke-width: 1.3; }
+svg .zenith { stroke: var(--ink); stroke-width: 1.4; stroke-dasharray: 5 4; }
+svg .arc { stroke: var(--accent); stroke-width: 5; fill: none; stroke-linecap: round; }
+svg .angle { stroke: var(--ink); stroke-width: 1.4; fill: none; }
+svg .angle.theta { stroke: var(--accent); stroke-width: 2; }
+svg .city { fill: var(--ink); stroke: var(--surface); stroke-width: 2; }
+svg .sun { fill: var(--accent); }
+svg text { fill: var(--ink); font-family: var(--body); font-size: 15px; paint-order: stroke; stroke: var(--surface); stroke-width: 4px; stroke-linejoin: round; }
+svg text.m { fill: var(--muted); font-size: 13px; }
+svg text.a { fill: var(--accent); font-weight: 600; }
+svg .arrow { fill: var(--accent); }
+.legend { list-style: none; padding: 0; margin: 20px 0 0; display: grid; gap: 10px; }
+.legend li { display: grid; grid-template-columns: 30px 1fr; gap: 10px; align-items: center; font-size: .95rem; }
+.legend svg { width: 30px; height: 12px; }
+.legend b { font-family: var(--mono); font-weight: 500; color: var(--accent); }
+
+/* demo */
+.demo { display: grid; gap: 24px; margin-top: 32px; }
+@media (min-width: 1000px) { .demo { grid-template-columns: 380px 1fr; } }
+.controls { display: grid; gap: 16px; align-content: start; }
+.controls fieldset { border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px 14px; margin: 0; }
+.controls legend { font-weight: 600; padding: 0 6px; font-size: .95rem; }
+.fieldrow { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.controls label { display: grid; gap: 4px; font-size: .85rem; color: var(--muted); }
+.controls label.inline { display: flex; align-items: center; gap: 8px; color: var(--ink); font-size: .95rem; }
+input[type=number], input[type=date], select {
+  font: 500 1rem var(--mono); color: var(--ink); background: var(--bg);
+  border: 1px solid var(--line); border-radius: 8px; padding: 9px 10px; width: 100%; min-width: 0;
+}
+input[type=number]:focus, input[type=date]:focus, select:focus { border-color: var(--accent); }
+input[type=checkbox], input[type=radio] { accent-color: var(--accent); width: 18px; height: 18px; }
+input[type=range] { width: 100%; accent-color: var(--accent); }
+.presets { display: flex; flex-wrap: wrap; gap: 8px; }
+.presets button { font: 500 .85rem var(--body); color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 999px; padding: 7px 12px; cursor: pointer; transition: border-color .15s, background .15s; }
+.presets button:hover, .presets button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.output { display: grid; gap: 18px; align-content: start; min-width: 0; }
+.answer { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 24px; }
+.answer .big { margin: 0; }
+.errs { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.errs div { background: var(--sunken); border-radius: 8px; padding: 10px 12px; }
+.errs span { display: block; font-size: .8rem; color: var(--muted); }
+.errs strong { font: 600 1.15rem var(--mono); }
+.suntable { width: 100%; border-collapse: collapse; font-size: .92rem; }
+.suntable th, .suntable td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+.suntable thead th { font-weight: 500; color: var(--muted); font-size: .8rem; }
+.worksheet { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.worksheet li { background: var(--sunken); border-radius: 8px; padding: 12px 14px; font-family: var(--mono); font-size: .9rem; overflow-x: auto; }
+.worksheet li b { font-family: var(--body); display: block; margin-bottom: 4px; font-size: .9rem; }
+.warnings { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+.warnings li { border-left: 3px solid var(--accent); background: var(--accent-soft); padding: 8px 12px; border-radius: 0 6px 6px 0; font-size: .92rem; }
+.status { color: var(--muted); font-style: italic; }
+[data-changed] { animation: flash .5s ease; }
+@keyframes flash { from { background: var(--accent-soft); } to { background: transparent; } }
+
+/* tiles */
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; margin-top: 32px; }
+.tile { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; transition: transform .2s, border-color .2s; }
+.tile:hover { transform: translateY(-3px); border-color: var(--accent); }
+.tile .num { font-family: var(--display); font-weight: 700; font-size: 2.4rem; line-height: 1.05; color: var(--accent); font-variant-numeric: tabular-nums; }
+.tile .what { font-weight: 600; margin: 6px 0 4px; }
+.tile .src { font: .78rem/1.4 var(--mono); color: var(--muted); }
+
+/* code */
+.codes { display: grid; gap: 28px; margin-top: 32px; }
+.code-item { display: grid; gap: 18px; }
+@media (min-width: 950px) { .code-item { grid-template-columns: 1fr 1.6fr; align-items: start; } .code-item:nth-child(even) .code-text { order: 2; } }
+.code-text p { font-size: 1rem; }
+.code-box { border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: var(--surface); min-width: 0; }
+.code-box .path { font: 500 .8rem var(--mono); color: var(--muted); padding: 10px 14px; border-bottom: 1px solid var(--line); background: var(--sunken); display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.code-box pre { margin: 0; padding: 16px; overflow-x: auto; font: 400 .84rem/1.6 var(--mono); }
+.code-box code { font-size: inherit; background: none; }
+.hljs-keyword, .hljs-literal { color: var(--accent); font-weight: 500; }
+.hljs-comment { color: var(--muted); font-style: italic; }
+.hljs-string { color: #3d7a4a; }
+.hljs-number { color: #2b5f9e; }
+.hljs-title, .hljs-title.function_ { font-weight: 600; }
+.hljs-built_in, .hljs-variable.language_ { color: #7a4e8a; }
+@media (prefers-color-scheme: dark) {
+  .hljs-string { color: #9ccf8f; }
+  .hljs-number { color: #8fbaf0; }
+  .hljs-built_in, .hljs-variable.language_ { color: #d2a6e6; }
+}
+
+/* stack */
+.stack { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; margin-top: 32px; }
+.stack .card h3 { font-family: var(--body); font-size: 1rem; font-weight: 600; margin: 0 0 4px; display: flex; justify-content: space-between; gap: 8px; }
+.stack .card h3 span { font: 400 .78rem var(--mono); color: var(--muted); }
+.stack .card p { font-size: .94rem; margin: 0; color: var(--muted); }
+.stack .group { grid-column: 1 / -1; font: 500 .8rem var(--mono); text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-top: 12px; }
+
+/* timeline */
+.timeline { list-style: none; margin: 40px 0 0; padding: 0; position: relative; display: grid; gap: 28px; }
+.timeline::before { content: ''; position: absolute; left: 11px; top: 6px; bottom: 6px; width: 2px; background: var(--line); }
+.timeline li { position: relative; padding-left: 44px; }
+.timeline li::before { content: ''; position: absolute; left: 3px; top: 6px; width: 18px; height: 18px; border-radius: 50%; background: var(--bg); border: 3px solid var(--accent); }
+.timeline li.major::before { background: var(--accent); }
+@media (min-width: 900px) {
+  .timeline { grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .timeline::before { left: 0; right: 0; top: 9px; bottom: auto; width: auto; height: 2px; }
+  .timeline li { padding-left: 0; padding-top: 40px; }
+  .timeline li::before { left: 0; top: 0; }
+}
+.timeline time { font: 500 .85rem var(--mono); color: var(--accent); display: block; }
+.timeline h3 { margin: 4px 0 6px; font-size: 1.15rem; }
+.timeline p { font-size: .95rem; color: var(--muted); }
+.timeline code { font-size: .8rem; }
+
+/* limits */
+.limits { display: grid; gap: 14px; margin-top: 32px; }
+@media (min-width: 800px) { .limits { grid-template-columns: 1fr 1fr; } }
+.limits .card p { margin: 0; font-size: .96rem; }
+.limits .card h3 { font-family: var(--body); font-size: 1rem; }
+.limits .src { font: .78rem var(--mono); color: var(--muted); display: block; margin-top: 8px; }
+
+/* footer */
+footer { padding: 72px 0 48px; }
+.foot-grid { display: grid; gap: 32px; }
+@media (min-width: 900px) { .foot-grid { grid-template-columns: 1.3fr 1fr; } }
+.term { background: #161a22; color: #e6e1d6; border-radius: var(--radius); padding: 18px; font: .88rem/1.8 var(--mono); overflow-x: auto; }
+.term .c { color: #9a9486; }
+.term .p { color: #f0b451; user-select: none; }
+footer ul { padding-left: 1.1em; }
+.fine { font-size: .85rem; color: var(--muted); margin-top: 32px; border-top: 1px solid var(--line); padding-top: 20px; max-width: none; }
+
+/* motion */
+.js .reveal { opacity: 0; transform: translateY(18px); transition: opacity .7s ease, transform .7s ease; }
+.js .reveal.in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .js .reveal { opacity: 1; transform: none; transition: none; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<nav class="topnav" aria-label="Sections">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="EratosthenesLake, back to top">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5" fill="currentColor"/><g stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 1.5v3M12 19.5v3M1.5 12h3M19.5 12h3M4.6 4.6l2.1 2.1M17.3 17.3l2.1 2.1M4.6 19.4l2.1-2.1M17.3 6.7l2.1-2.1"/></g></svg>
+      EratosthenesLake
+    </a>
+    <ul>
+      <li><a class="nl" href="#question">Question</a></li>
+      <li><a class="nl" href="#method">Method</a></li>
+      <li><a class="nl" href="#diagram">Diagram</a></li>
+      <li><a class="nl" href="#demo">Demo</a></li>
+      <li><a class="nl" href="#numbers">Numbers</a></li>
+      <li><a class="nl" href="#code">Code</a></li>
+      <li><a class="nl" href="#stack">Stack</a></li>
+      <li><a class="nl" href="#timeline">Timeline</a></li>
+      <li><a class="nl" href="#limits">Limits</a></li>
+      <li><a class="nl" href="#run">Run it</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap hero-grid">
+    <div class="reveal">
+      <p class="kicker">Eratosthenes' method · in the browser</p>
+      <h1>Eratosthenes<wbr>Lake</h1>
+      <p class="lede"><strong>Measure the circumference of the Earth from two cities and the noon Sun.</strong>
+        Pick two places roughly north–south of each other. The site finds how high the Sun stands at local solar noon in each,
+        measures the distance between them, and turns the difference into the size of the planet.</p>
+      <div class="cta">
+        <a class="btn primary" href="#demo">Try the live demo</a>
+        <a class="btn ghost" href="https://jlake27-lgtm.github.io/EratosthenesLake/">Open the full site ↗</a>
+      </div>
+    </div>
+    <aside class="result-card reveal" aria-label="Example result">
+      <div class="label">Boston → Maracaibo · 29 September 2026 · atmosphere on</div>
+      <div class="big">39,908 <small>km</small></div>
+      <div><span class="pill">−0.42% vs 40,075 km equator</span><span class="pill">−0.25% vs 40,008 km pole-to-pole</span></div>
+      <div class="eq" aria-label="C equals 360 times 3,514.6 kilometres divided by 31.7038 degrees">C = 360 × 3,514.6 km ÷ 31.7038°</div>
+      <div class="label">The example pair from the project's own test suite (<code>test/math.test.js</code>), recomputed with the real code.</div>
+    </aside>
+  </div>
+</header>
+
+<main id="main">
+
+<section class="block" id="question" aria-labelledby="q-h">
+  <div class="wrap two">
+    <div class="reveal">
+      <span class="eyebrow">01 · The question</span>
+      <h2 id="q-h">Can you measure the whole planet without leaving your desk?</h2>
+      <p class="section-intro">Eratosthenes' idea: the Sun is so far away that its rays arrive parallel. If two places on the same meridian
+        see the noon Sun at different heights, that difference in angle is the slice of the Earth's 360° that lies between them.</p>
+      <p>In class this is a Stellarium exercise: look up the Sun's altitude at noon in two cities, convert degrees–minutes–seconds to decimals,
+        subtract, measure the distance, and set up a proportion. EratosthenesLake does "the same steps as the Stellarium classroom exercise,
+        done automatically and shown as a worksheet" — for any pair of ~34,600 places, on any date.</p>
+    </div>
+    <div class="card reveal" aria-label="What the site automates">
+      <h3>What the site does for you</h3>
+      <ol class="handlist">
+        <li><span class="n">A</span><span><strong>City search</strong> across Stellarium's own location database, so any pair can be cross-checked in Stellarium.</span></li>
+        <li><span class="n">B</span><span><strong>Partner suggestions</strong> within ±0.5–3° of longitude of City A, filtered by population and time zone.</span></li>
+        <li><span class="n">C</span><span><strong>Sun at the meridian</strong>: solar-noon time, altitude (DMS and decimal), azimuth, with Stellarium's atmosphere toggle.</span></li>
+        <li><span class="n">D</span><span><strong>Worksheet</strong> for handout steps 9–11, with % error against 40,075 km and 40,008 km.</span></li>
+        <li><span class="n">E</span><span><strong>Warnings</strong> for pairs off the meridian, too close, in different time zones, on opposite sides of the Sun, or in polar night.</span></li>
+        <li><span class="n">F</span><span><strong>Map and accuracy charts</strong>: your own trials plus two reference charts of 250 real city pairs each.</span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="block alt" id="method" aria-labelledby="m-h">
+  <div class="wrap">
+    <div class="reveal">
+      <span class="eyebrow">02 · How it works</span>
+      <h2 id="m-h">Four steps from sunlight to kilometres</h2>
+      <p class="section-intro">Every result follows the same path through <code>measure()</code> in <code>src/experiment.js</code>. Numbers below are the Boston → Maracaibo example.</p>
+    </div>
+    <div class="steps">
+      <article class="card step reveal">
+        <h3>Find solar noon</h3>
+        <p>For each city, Astronomy Engine searches for the moment the Sun crosses the local meridian (hour angle 0) on the chosen local date and returns its altitude <em>h</em> and azimuth. Refraction is on by default, like Stellarium with the atmosphere shown.</p>
+        <p class="mono">Boston: h = 45.0553° at 16:34:29 UTC, due south</p>
+      </article>
+      <article class="card step reveal">
+        <h3>Turn altitude into a signed zenith angle</h3>
+        <div class="math" data-tex="z = \pm\,(90^\circ - h)">z = ±(90° − h)</div>
+        <p>Use <strong>+</strong> when the noon Sun is due south, <strong>−</strong> when it is due north. The sign records which way you face to see the Sun. That keeps the next step right even when the cities are in different hemispheres.</p>
+      </article>
+      <article class="card step reveal">
+        <h3>Get the arc angle</h3>
+        <div class="math" data-tex="\theta = \lvert z_A - z_B \rvert">θ = |z_A − z_B|</div>
+        <p>With the Sun on the same side for both cities this equals the difference of altitudes. On opposite sides it becomes their sum.</p>
+      </article>
+      <article class="card step reveal">
+        <h3>Measure and set up the proportion</h3>
+        <div class="math" data-tex="\begin{gathered} \frac{360^\circ}{\theta} = \frac{C}{d} \\[6pt] C = \frac{360^\circ \times d}{\theta} \end{gathered}">360° / θ = C / d → C = 360° × d / θ</div>
+        <p>GeographicLib measures <em>d</em> on the WGS84 ellipsoid. The default is the north–south distance between the two latitudes, which is what the Sun angle actually measures.</p>
+      </article>
+    </div>
+
+    <div class="card reveal" style="margin-top:28px">
+      <h3>Every variable, with real values</h3>
+      <div class="table-wrap">
+        <table class="vars">
+          <thead><tr><th scope="col">Symbol</th><th scope="col">Meaning</th><th scope="col">Boston → Maracaibo, 2026-09-29</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">h<sub>A</sub>, h<sub>B</sub></th><td>Sun's altitude at local solar noon (with refraction)</td><td class="v">45.0553°, 76.7591°</td></tr>
+            <tr><th scope="row">z<sub>A</sub>, z<sub>B</sub></th><td>Signed zenith angle, 90° − h (both due south, so both +)</td><td class="v">44.9447°, 13.2409°</td></tr>
+            <tr><th scope="row">θ</th><td>Arc of the Earth between the cities</td><td class="v">31.7038°</td></tr>
+            <tr><th scope="row">d</th><td>North–south distance on the WGS84 ellipsoid</td><td class="v">3,514.6 km</td></tr>
+            <tr><th scope="row">C</th><td>Computed circumference, 360 × d / θ</td><td class="v">39,908 km</td></tr>
+            <tr><th scope="row">error</th><td>vs <code>EARTH_EQUATORIAL_KM = 40075.017</code> (<code>src/calc.js</code>)</td><td class="v">−0.42%</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="margin-top:14px;font-size:.95rem;color:var(--muted)">Why a few tenths of a percent under 40,075 km? The Earth is slightly flattened: its circumference through the poles is 40,008 km, and a degree of latitude is a little longer near the poles than near the equator (README).</p>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="diagram" aria-labelledby="d-h">
+  <div class="wrap two wide-right">
+    <div class="reveal">
+      <span class="eyebrow">03 · The geometry</span>
+      <h2 id="d-h">Parallel rays, two zenith lines, one slice of Earth</h2>
+      <p>The Sun's rays reach both cities parallel. Each city's "straight up" direction points away from the Earth's centre, so the
+        angle between a city's zenith and the Sun equals its zenith angle <em>z</em>. The two radii meet at the centre with angle <em>θ</em> — the same θ the
+        worksheet gets by subtracting zenith angles.</p>
+      <p>The drawing uses the Sun's declination and the cities' latitudes from the demo below, and redraws when you change them.</p>
+      <ul class="legend" aria-label="Diagram legend">
+        <li><svg viewBox="0 0 30 12" aria-hidden="true"><line x1="0" y1="6" x2="30" y2="6" class="ray"/></svg><span>Sunlight, arriving parallel</span></li>
+        <li><svg viewBox="0 0 30 12" aria-hidden="true"><line x1="0" y1="6" x2="30" y2="6" class="zenith"/></svg><span>Zenith (straight up) at each city</span></li>
+        <li><svg viewBox="0 0 30 12" aria-hidden="true"><line x1="2" y1="6" x2="28" y2="6" class="arc" style="stroke-width:4"/></svg><span>Arc between the cities: <b id="lg-d">3,514.6 km</b> for <b id="lg-t">31.7038°</b></span></li>
+      </ul>
+    </div>
+    <figure class="diagram-fig reveal">
+      <svg id="geo" viewBox="0 0 520 440" role="img" aria-labelledby="geo-title geo-desc">
+        <title id="geo-title">Eratosthenes geometry</title>
+        <desc id="geo-desc">Cross-section of the Earth with parallel sunlight. Two cities on the circle, their zenith lines, and the angle between their radii at the Earth's centre.</desc>
+        <defs>
+          <marker id="arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" class="arrow"/>
+          </marker>
+        </defs>
+        <g id="geo-layer"></g>
+      </svg>
+      <figcaption id="geo-cap">Schematic cross-section along a meridian (latitudes to scale, Earth drawn as a circle).</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="block alt" id="demo" aria-labelledby="demo-h">
+  <div class="wrap">
+    <div class="reveal">
+      <span class="eyebrow">04 · Live demo</span>
+      <h2 id="demo-h">Run the measurement yourself</h2>
+      <p class="section-intro">This runs a line-for-line port of the project's <code>sunAtTransit</code>, <code>cityDistances</code>, <code>arcAngle</code> and
+        <code>circumference</code>, using the same library versions (Astronomy Engine 2.1.19, GeographicLib 2.2.0). The full site adds city search, a map and charts.</p>
+    </div>
+    <div class="demo">
+      <form class="card controls reveal" id="demo-form" aria-label="Measurement inputs" onsubmit="return false">
+        <div>
+          <div style="font-size:.85rem;color:var(--muted);margin-bottom:6px" id="preset-label">Presets from the test suite</div>
+          <div class="presets" role="group" aria-labelledby="preset-label">
+            <button type="button" data-p="0" aria-pressed="true">Boston → Maracaibo</button>
+            <button type="button" data-p="1" aria-pressed="false">30°N → 45°N at 80°W</button>
+            <button type="button" data-p="2" aria-pressed="false">20°S → 40°N at 20°E</button>
+            <button type="button" data-p="3" aria-pressed="false">Boston → Miami</button>
+          </div>
+        </div>
+        <fieldset>
+          <legend>City A</legend>
+          <div class="fieldrow">
+            <label>Latitude (°, N +)<input type="number" id="latA" step="0.0001" min="-90" max="90" /></label>
+            <label>Longitude (°, E +)<input type="number" id="lonA" step="0.0001" min="-180" max="180" /></label>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>City B</legend>
+          <div class="fieldrow">
+            <label>Latitude (°, N +)<input type="number" id="latB" step="0.0001" min="-90" max="90" /></label>
+            <label>Longitude (°, E +)<input type="number" id="lonB" step="0.0001" min="-180" max="180" /></label>
+          </div>
+          <label style="margin-top:10px">Slide City B's latitude
+            <input type="range" id="latBr" min="-80" max="80" step="0.01" aria-describedby="latBr-note" />
+          </label>
+          <span id="latBr-note" style="font-size:.78rem;color:var(--muted)">Moves City B north or south along its meridian.</span>
+        </fieldset>
+        <label>Local date<input type="date" id="date" /></label>
+        <label class="inline"><input type="checkbox" id="refraction" /> Atmosphere on (refraction, Stellarium's "A" key)</label>
+        <fieldset>
+          <legend>Distance to use</legend>
+          <label class="inline"><input type="radio" name="dist" value="ns" /> North–south only (recommended)</label>
+          <label class="inline"><input type="radio" name="dist" value="straight" /> Straight line (like Google Maps)</label>
+        </fieldset>
+      </form>
+
+      <div class="card output reveal" aria-live="polite" id="demo-out">
+        <p class="status" id="demo-status">Loading Astronomy Engine and GeographicLib…</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="numbers" aria-labelledby="n-h">
+  <div class="wrap">
+    <div class="reveal">
+      <span class="eyebrow">05 · Key numbers</span>
+      <h2 id="n-h">The project in figures</h2>
+      <p class="section-intro">Each figure can be reproduced from the repository; the source is under each tile.</p>
+    </div>
+    <div class="tiles">
+      <div class="tile reveal"><div class="num">34,632</div><div class="what">places to choose from</div><div class="src">rows in public/data/cities.json</div></div>
+      <div class="tile reveal"><div class="num">−0.42%</div><div class="what">error, Boston → Maracaibo</div><div class="src">measure() in src/experiment.js</div></div>
+      <div class="tile reveal"><div class="num">11</div><div class="what">passing tests</div><div class="src">npx vitest run · test/math.test.js</div></div>
+      <div class="tile reveal"><div class="num">10</div><div class="what">JavaScript modules, 1,057 lines</div><div class="src">wc -l src/*.js</div></div>
+      <div class="tile reveal"><div class="num">250</div><div class="what">real city pairs per reference chart</div><div class="src">buildReference(…, n = 250)</div></div>
+      <div class="tile reveal"><div class="num">3</div><div class="what">runtime dependencies</div><div class="src">package.json "dependencies"</div></div>
+      <div class="tile reveal"><div class="num">40,075.017</div><div class="what">km, the equatorial reference</div><div class="src">EARTH_EQUATORIAL_KM · src/calc.js</div></div>
+      <div class="tile reveal"><div class="num">3</div><div class="what">commits</div><div class="src">git log --oneline</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="block alt" id="code" aria-labelledby="c-h">
+  <div class="wrap">
+    <div class="reveal">
+      <span class="eyebrow">06 · Code highlights</span>
+      <h2 id="c-h">Three small ideas that make it work</h2>
+    </div>
+    <div class="codes">
+      <article class="code-item reveal">
+        <div class="code-text">
+          <h3>Signed zenith angles</h3>
+          <p>Subtracting altitudes breaks when the noon Sun is south of one city and north of the other. Giving each zenith angle a sign from the Sun's azimuth makes one formula, <code>|zA − zB|</code>, correct in every case — the cross-hemisphere test pair depends on it.</p>
+        </div>
+        <div class="code-box">
+          <div class="path"><span>src/calc.js</span><span>lines 37–52</span></div>
+<pre><code class="language-javascript">export function signedZenith(altitude, azimuth) {
+  const facingSouth = Math.cos((azimuth * Math.PI) / 180) &lt; 0;
+  return (facingSouth ? 1 : -1) * (90 - altitude);
+}
+
+/** Step 10: angle of the arc of the Earth between the two cities. */
+export function arcAngle(sunA, sunB) {
+  const zA = signedZenith(sunA.altitude, sunA.azimuth);
+  const zB = signedZenith(sunB.altitude, sunB.azimuth);
+  return {
+    zA,
+    zB,
+    sameSide: Math.sign(zA) === Math.sign(zB) || zA === 0 || zB === 0,
+    angle: Math.abs(zA - zB),
+  };
+}</code></pre>
+        </div>
+      </article>
+      <article class="code-item reveal">
+        <div class="code-text">
+          <h3>Solar noon without time-zone rules</h3>
+          <p>The search starts at local <em>mean</em> midnight — UTC midnight shifted by longitude — so it always lands on the right local day, even near the date line (the Auckland test checks this). Then Astronomy Engine finds hour angle 0 and applies refraction if asked.</p>
+        </div>
+        <div class="code-box">
+          <div class="path"><span>src/sun.js</span><span>lines 16–25</span></div>
+<pre><code class="language-javascript">  // Start the search at local *mean* midnight (UTC midnight shifted by longitude).
+  // Solar noon is always within ~20 min of 12h later, so this finds the transit
+  // on the right local day without needing time-zone rules.
+  const [y, m, d] = isoDate.split('-').map(Number);
+  const localMidnightUtc = Date.UTC(y, m - 1, d) - (place.lon / 15) * 3600_000;
+  const start = Astronomy.MakeTime(new Date(localMidnightUtc));
+
+  const event = Astronomy.SearchHourAngle(Astronomy.Body.Sun, observer, 0, start, +1);
+  const eq = Astronomy.Equator(Astronomy.Body.Sun, event.time, observer, true, true);
+  const hor = Astronomy.Horizon(event.time, observer, eq.ra, eq.dec, refraction ? 'normal' : undefined);</code></pre>
+        </div>
+      </article>
+      <article class="code-item reveal">
+        <div class="code-text">
+          <h3>The north–south distance trick</h3>
+          <p>The Sun angle only measures how far apart the cities are in latitude. Moving both cities onto longitude 0 before asking GeographicLib for the distance gives exactly that meridian arc on the WGS84 ellipsoid, next to the ordinary straight-line distance.</p>
+        </div>
+        <div class="code-box">
+          <div class="path"><span>src/geo.js</span><span>lines 22–31</span></div>
+<pre><code class="language-javascript">export function cityDistances(a, b) {
+  const straight = WGS84.Inverse(a.lat, a.lon, b.lat, b.lon);
+  const meridian = WGS84.Inverse(a.lat, 0, b.lat, 0);
+  return {
+    straightKm: straight.s12 / 1000,
+    northSouthKm: meridian.s12 / 1000,
+    dLat: b.lat - a.lat,
+    dLon: lonDiff(a.lon, b.lon),
+  };
+}</code></pre>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="stack" aria-labelledby="s-h">
+  <div class="wrap">
+    <div class="reveal">
+      <span class="eyebrow">07 · Tech stack</span>
+      <h2 id="s-h">What it's built with</h2>
+    </div>
+    <div class="stack">
+      <div class="group">Language &amp; tooling</div>
+      <div class="card reveal"><h3>JavaScript <span>ES modules</span></h3><p>All app logic, in ten modules under <code>src/</code>, plus HTML and CSS.</p></div>
+      <div class="card reveal"><h3>Vite <span>^8.3.1</span></h3><p>Dev server and static build; <code>base: './'</code> so the site works from a GitHub Pages sub-path.</p></div>
+      <div class="card reveal"><h3>Vitest <span>^5.0.2</span></h3><p>Runs the 11 math tests in <code>test/math.test.js</code>.</p></div>
+      <div class="card reveal"><h3>Node.js <span>≥ 22.12</span></h3><p>Required to run it; also runs <code>scripts/build-cities.mjs</code> to convert Stellarium's data.</p></div>
+      <div class="card reveal"><h3>GitHub Actions + Pages</h3><p>Every push to <code>main</code> tests, builds and publishes <code>dist/</code>. If tests fail, nothing is deployed.</p></div>
+      <div class="group">Libraries</div>
+      <div class="card reveal"><h3>Astronomy Engine <span>^2.1.19</span></h3><p>Finds the Sun's meridian transit and its altitude/azimuth, with optional refraction.</p></div>
+      <div class="card reveal"><h3>GeographicLib <span>^2.2.0</span></h3><p>Geodesic distances on the WGS84 ellipsoid, both straight-line and north–south.</p></div>
+      <div class="card reveal"><h3>Leaflet <span>^1.9.4</span></h3><p>Map of the two cities and City A's meridian, on OpenStreetMap tiles.</p></div>
+      <div class="card reveal"><h3>Hand-built SVG charts</h3><p><code>src/chart.js</code> is a dependency-free scatter chart for trials and reference pairs.</p></div>
+      <div class="group">Data</div>
+      <div class="card reveal"><h3>Stellarium locations</h3><p><code>base_locations.txt</code> and <code>regions-geoscheme.tab</code> (GPL-2.0+), city data originally from GeoNames (CC-BY 4.0).</p></div>
+      <div class="card reveal"><h3>IBM Plex Sans &amp; Mono</h3><p>The app's typefaces, via Google Fonts.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="block alt" id="timeline" aria-labelledby="t-h">
+  <div class="wrap">
+    <div class="reveal">
+      <span class="eyebrow">08 · Timeline</span>
+      <h2 id="t-h">From empty repo to live site in one afternoon</h2>
+      <p class="section-intro">The git history has three commits, all on 29 September 2026. The app itself arrived in a single commit, so the history doesn't show earlier drafts.</p>
+    </div>
+    <ol class="timeline">
+      <li class="reveal">
+        <time datetime="2026-09-29T13:20:16-04:00">29 Sep 2026 · 13:20</time>
+        <h3>Initial commit</h3>
+        <p>MIT licence and a two-line README. <code>b4aa728</code></p>
+      </li>
+      <li class="reveal major">
+        <time datetime="2026-09-29T13:23:29-04:00">29 Sep 2026 · 13:23</time>
+        <h3>Add Eratosthenes circumference simulator</h3>
+        <p>23 files and 37,836 added lines: all ten modules, tests, the Stellarium data (34,751 of those lines) and the generated city list. <code>3f68f8b</code></p>
+      </li>
+      <li class="reveal">
+        <time datetime="2026-09-29T14:37:02-04:00">29 Sep 2026 · 14:37</time>
+        <h3>Deploy to GitHub Pages with Actions</h3>
+        <p>A workflow that tests, builds and publishes on every push to <code>main</code>, plus a Deploying section in the README. <code>61e3502</code></p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section class="block" id="limits" aria-labelledby="l-h">
+  <div class="wrap">
+    <div class="reveal">
+      <span class="eyebrow">09 · Limitations &amp; what's next</span>
+      <h2 id="l-h">Honest edges</h2>
+      <p class="section-intro">The repo has no TODOs or roadmap. These are limits stated in the README or visible in the code.</p>
+    </div>
+    <div class="limits">
+      <div class="card reveal"><h3>Needs a web server</h3><p>Opening the app's <code>index.html</code> straight from disk doesn't work, because browsers block module scripts on <code>file://</code> pages. Use <code>npm run dev</code> or the live site.</p><span class="src">README.md · src/main.js</span></div>
+      <div class="card reveal"><h3>A spherical proportion</h3><p>C = 360 × d / θ assumes a sphere. Because the Earth is flattened, even the north–south method usually lands a few tenths of a percent below 40,075 km.</p><span class="src">README.md "How the calculation works"</span></div>
+      <div class="card reveal"><h3>Time zones checked for today</h3><p>"Same time zone" compares UTC offsets <em>right now</em>, not on the chosen date, so daylight-saving differences on other dates aren't considered.</p><span class="src">src/cities.js · sameZone(), utcOffsetLabel()</span></div>
+      <div class="card reveal"><h3>Tests cover the math only</h3><p>The 11 tests exercise DMS conversion, Sun transit, distances and the full pipeline. The UI, search, map and charts have no automated tests.</p><span class="src">test/math.test.js</span></div>
+      <div class="card reveal"><h3>Online map</h3><p>The map loads OpenStreetMap tiles, so it needs a network connection.</p><span class="src">src/map.js</span></div>
+      <div class="card reveal"><h3>Short history</h3><p>Three commits on one day, so there's no record yet of how the design evolved or what was tried and dropped.</p><span class="src">git log</span></div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer id="run" aria-labelledby="r-h">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="reveal">
+        <span class="eyebrow">10 · Run it</span>
+        <h2 id="r-h">Try it locally</h2>
+        <p>Requires Node.js 22.12 or newer.</p>
+<pre class="term" aria-label="Commands to run the project"><span class="p">$ </span>npm install
+<span class="p">$ </span>npm run dev        <span class="c"># http://localhost:5173</span>
+<span class="p">$ </span>npm test           <span class="c"># math tests (vitest)</span>
+<span class="p">$ </span>npm run build      <span class="c"># static site in dist/</span>
+<span class="p">$ </span>npm run preview    <span class="c"># serve the built site locally</span>
+<span class="p">$ </span>npm run cities     <span class="c"># rebuild public/data/cities.json</span></pre>
+      </div>
+      <div class="reveal">
+        <h3>Links</h3>
+        <ul>
+          <li>Live site: <a href="https://jlake27-lgtm.github.io/EratosthenesLake/">jlake27-lgtm.github.io/EratosthenesLake</a></li>
+          <li>Repository: <a href="https://github.com/jlake27-lgtm/EratosthenesLake">github.com/jlake27-lgtm/EratosthenesLake</a></li>
+        </ul>
+        <h3>Credits</h3>
+        <p style="font-size:.95rem">City list from <a href="https://stellarium.org">Stellarium</a> (GeoNames data, CC-BY 4.0). Sun positions by
+          <a href="https://github.com/cosinekitty/astronomy">Astronomy Engine</a> (MIT). Distances by <a href="https://geographiclib.sourceforge.io/">GeographicLib</a> (MIT).
+          Map by <a href="https://leafletjs.com/">Leaflet</a> with © OpenStreetMap contributors. Code MIT licensed.</p>
+      </div>
+    </div>
+    <p class="fine">Showcase page generated on <time datetime="2026-09-30">30 September 2026</time> from the repository at commit <code>61e3502</code>.</p>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/geographiclib-geodesic@2.2.0/geographiclib-geodesic.min.js" defer></script>
+<script>
+document.documentElement.classList.add('js');
+
+// ---------- reveal on scroll + active nav ----------
+(function () {
+  const els = document.querySelectorAll('.reveal');
+  if (!('IntersectionObserver' in window)) { els.forEach((e) => e.classList.add('in')); return; }
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+  }, { rootMargin: '0px 0px -8% 0px', threshold: 0.05 });
+  els.forEach((e) => io.observe(e));
+
+  const links = [...document.querySelectorAll('.topnav a.nl')];
+  const spy = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      if (!e.isIntersecting) continue;
+      links.forEach((l) => l.setAttribute('aria-current', l.getAttribute('href') === '#' + e.target.id ? 'true' : 'false'));
+    }
+  }, { rootMargin: '-45% 0px -50% 0px' });
+  document.querySelectorAll('main section[id], footer[id]').forEach((s) => spy.observe(s));
+})();
+
+// ---------- ports of the project's math (src/calc.js, src/geo.js, src/sun.js) ----------
+const EARTH_EQUATORIAL_KM = 40075.017;
+const EARTH_MERIDIONAL_KM = 40007.863;
+
+function toDMS(decimal, secondsDigits = 1) {
+  const sign = decimal < 0 ? -1 : 1;
+  const scale = 10 ** secondsDigits;
+  let ticks = Math.round(Math.abs(decimal) * 3600 * scale);
+  const s = (ticks % (60 * scale)) / scale;
+  ticks = Math.floor(ticks / (60 * scale));
+  const m = ticks % 60;
+  const d = Math.floor(ticks / 60);
+  return { sign, d, m, s };
+}
+function formatDMS(decimal, secondsDigits = 1) {
+  const { sign, d, m, s } = toDMS(decimal, secondsDigits);
+  const sec = s.toFixed(secondsDigits).padStart(secondsDigits ? 3 + secondsDigits : 2, '0');
+  return `${sign < 0 ? '-' : '+'}${d}°${String(m).padStart(2, '0')}'${sec}"`;
+}
+function signedZenith(altitude, azimuth) {
+  const facingSouth = Math.cos((azimuth * Math.PI) / 180) < 0;
+  return (facingSouth ? 1 : -1) * (90 - altitude);
+}
+function arcAngle(sunA, sunB) {
+  const zA = signedZenith(sunA.altitude, sunA.azimuth);
+  const zB = signedZenith(sunB.altitude, sunB.azimuth);
+  return { zA, zB, sameSide: Math.sign(zA) === Math.sign(zB) || zA === 0 || zB === 0, angle: Math.abs(zA - zB) };
+}
+function circumference(distanceKm, angleDeg) {
+  if (!(angleDeg > 0)) return NaN;
+  return (360 * distanceKm) / angleDeg;
+}
+function percentError(measured, actual) { return ((measured - actual) / actual) * 100; }
+function lonDiff(lonA, lonB) {
+  let d = lonB - lonA;
+  while (d > 180) d -= 360;
+  while (d < -180) d += 360;
+  return d;
+}
+function cityDistances(a, b) {
+  const WGS84 = window.geodesic.Geodesic.WGS84;
+  const straight = WGS84.Inverse(a.lat, a.lon, b.lat, b.lon);
+  const meridian = WGS84.Inverse(a.lat, 0, b.lat, 0);
+  return { straightKm: straight.s12 / 1000, northSouthKm: meridian.s12 / 1000, dLat: b.lat - a.lat, dLon: lonDiff(a.lon, b.lon) };
+}
+function sunAtTransit(place, isoDate, { refraction = true } = {}) {
+  const observer = new Astronomy.Observer(place.lat, place.lon, place.elevation ?? 0);
+  const [y, m, d] = isoDate.split('-').map(Number);
+  const localMidnightUtc = Date.UTC(y, m - 1, d) - (place.lon / 15) * 3600_000;
+  const start = Astronomy.MakeTime(new Date(localMidnightUtc));
+  const event = Astronomy.SearchHourAngle(Astronomy.Body.Sun, observer, 0, start, +1);
+  const eq = Astronomy.Equator(Astronomy.Body.Sun, event.time, observer, true, true);
+  const hor = Astronomy.Horizon(event.time, observer, eq.ra, eq.dec, refraction ? 'normal' : undefined);
+  return { time: event.time.date, altitude: hor.altitude, azimuth: hor.azimuth, declination: eq.dec };
+}
+// src/experiment.js measure()
+function measure(a, b, { date, refraction, distMode }) {
+  const sunA = sunAtTransit(a, date, { refraction });
+  const sunB = sunAtTransit(b, date, { refraction });
+  const dist = cityDistances(a, b);
+  const arc = arcAngle(sunA, sunB);
+  const distanceKm = distMode === 'ns' ? dist.northSouthKm : dist.straightKm;
+  const C = circumference(distanceKm, arc.angle);
+  return { sunA, sunB, dist, arc, distanceKm, C, error: percentError(C, EARTH_EQUATORIAL_KM) };
+}
+
+// ---------- diagram ----------
+const fmt = (n, digits = 0) => n.toLocaleString('en-US', { minimumFractionDigits: digits, maximumFractionDigits: digits });
+const SVGNS = 'http://www.w3.org/2000/svg';
+
+function drawGeometry({ latA, latB, decl, zA, zB, angle, distanceKm, nameA, nameB }) {
+  const g = document.getElementById('geo-layer');
+  const W = 520, H = 440, cx = 205, cy = 220, R = 140;
+  const rad = (deg) => (deg * Math.PI) / 180;
+  const pt = (deg, r) => [cx + r * Math.cos(rad(deg)), cy - r * Math.sin(rad(deg))];
+  const P = (p) => `${p[0].toFixed(1)},${p[1].toFixed(1)}`;
+  const parts = [];
+  const add = (tag, attrs, text) => {
+    const el = document.createElementNS(SVGNS, tag);
+    for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+    if (text != null) el.textContent = text;
+    parts.push(el);
+    return el;
+  };
+  // sunward unit vector in SVG coordinates
+  const s = [Math.cos(rad(decl)), -Math.sin(rad(decl))];
+  const perp = [-s[1], s[0]];
+
+  add('circle', { cx, cy, r: R, class: 'earth' });
+  // night half (away from the Sun)
+  const n1 = pt(decl + 90, R), n2 = pt(decl - 90, R);
+  add('path', { d: `M${P(n1)} A${R},${R} 0 0 0 ${P(n2)} Z`, class: 'night' });
+  add('line', { x1: cx - R - 18, y1: cy, x2: cx + R + 18, y2: cy, class: 'equator' });
+  add('text', { x: cx - R - 14, y: cy - 6, class: 'm', 'text-anchor': 'start' }, 'equator');
+
+  // background rays
+  for (const p of [-120, -60, 60, 120]) {
+    const base = [cx + perp[0] * p, cy + perp[1] * p];
+    const t = Math.sqrt(R * R - p * p);
+    const end = [base[0] + s[0] * t, base[1] + s[1] * t];
+    const start = [end[0] + s[0] * 600, end[1] + s[1] * 600];
+    add('line', { x1: start[0], y1: start[1], x2: end[0], y2: end[1], class: 'ray faint', 'marker-end': 'url(#arrowhead)' });
+  }
+
+  // arc between cities
+  const hi = Math.max(latA, latB), lo = Math.min(latA, latB);
+  const large = hi - lo > 180 ? 1 : 0;
+  add('path', { d: `M${P(pt(hi, R))} A${R},${R} 0 ${large} 1 ${P(pt(lo, R))}`, class: 'arc' });
+  // radii and centre angle
+  add('line', { x1: cx, y1: cy, x2: pt(latA, R)[0], y2: pt(latA, R)[1], class: 'radius' });
+  add('line', { x1: cx, y1: cy, x2: pt(latB, R)[0], y2: pt(latB, R)[1], class: 'radius' });
+  const r0 = 38;
+  add('path', { d: `M${P(pt(hi, r0))} A${r0},${r0} 0 0 1 ${P(pt(lo, r0))}`, class: 'angle theta' });
+  const mid = (hi + lo) / 2;
+  const tl = pt(mid, r0 + 26);
+  add('text', { x: tl[0], y: tl[1] + 5, class: 'a', 'text-anchor': 'middle' }, `θ = ${angle.toFixed(2)}°`);
+  add('circle', { cx, cy, r: 3, class: 'city' });
+
+  // each city: zenith line, sun ray, zenith angle
+  for (const [lat, z, name, key] of [[latA, zA, nameA, 'A'], [latB, zB, nameB, 'B']]) {
+    const c = pt(lat, R);
+    const up = pt(lat, R + 62);
+    add('line', { x1: c[0], y1: c[1], x2: up[0], y2: up[1], class: 'zenith' });
+    const start = [c[0] + s[0] * 700, c[1] + s[1] * 700];
+    add('line', { x1: start[0], y1: start[1], x2: c[0], y2: c[1], class: 'ray', 'marker-end': 'url(#arrowhead)' });
+    const ra = 26, a1 = Math.max(lat, decl), a2 = Math.min(lat, decl);
+    if (Math.abs(lat - decl) > 1) {
+      const q1 = [c[0] + ra * Math.cos(rad(a1)), c[1] - ra * Math.sin(rad(a1))];
+      const q2 = [c[0] + ra * Math.cos(rad(a2)), c[1] - ra * Math.sin(rad(a2))];
+      add('path', { d: `M${P(q1)} A${ra},${ra} 0 0 1 ${P(q2)}`, class: 'angle' });
+    }
+    add('circle', { cx: c[0], cy: c[1], r: 6, class: 'city' });
+    const lp = pt(lat, R + 78);
+    const anchor = Math.cos(rad(lat)) < -0.3 ? 'end' : Math.cos(rad(lat)) > 0.3 ? 'start' : 'middle';
+    const ly = Math.min(H - 26, Math.max(20, lp[1]));
+    const estW = 8.5 * Math.max(name.length + 3, 10);
+    const lx = anchor === 'start' ? Math.min(W - 8 - estW, lp[0]) : Math.max(8 + (anchor === 'end' ? estW : estW / 2), lp[0]);
+    add('text', { x: lx, y: ly, 'text-anchor': anchor }, `${key}: ${name}`);
+    add('text', { x: lx, y: ly + 17, class: 'm', 'text-anchor': anchor }, `z = ${z >= 0 ? '+' : '−'}${Math.abs(z).toFixed(2)}°`);
+  }
+
+  // distance label just outside the arc
+  const dl = pt(mid, R + 14);
+  add('text', { x: dl[0], y: dl[1] + 5, class: 'a', 'text-anchor': Math.cos(rad(mid)) < 0 ? 'end' : 'start' }, `${fmt(distanceKm, 1)} km`);
+
+  // the Sun
+  const sp = [W - 26, Math.min(H - 30, Math.max(30, cy + s[1] * 300))];
+  add('circle', { cx: sp[0], cy: sp[1], r: 14, class: 'sun' });
+  add('text', { x: sp[0], y: sp[1] + 34, class: 'm', 'text-anchor': 'middle' }, 'Sun');
+  add('text', { x: W - 10, y: 24, class: 'm', 'text-anchor': 'end' }, `declination ${decl >= 0 ? '+' : '−'}${Math.abs(decl).toFixed(2)}°`);
+
+  g.replaceChildren(...parts);
+  document.getElementById('lg-d').textContent = `${fmt(distanceKm, 1)} km`;
+  document.getElementById('lg-t').textContent = `${angle.toFixed(4)}°`;
+  document.getElementById('geo-desc').textContent =
+    `Cross-section of the Earth with parallel sunlight at declination ${decl.toFixed(2)} degrees. City A (${nameA}) at latitude ${latA.toFixed(2)}, zenith angle ${zA.toFixed(2)}; City B (${nameB}) at latitude ${latB.toFixed(2)}, zenith angle ${zB.toFixed(2)}. The radii meet at the centre with angle ${angle.toFixed(2)} degrees, spanning ${fmt(distanceKm, 1)} km.`;
+}
+
+// Drawn immediately with the verified Boston → Maracaibo values, so the diagram works even offline.
+drawGeometry({ latA: 42.35843, latB: 10.6423, decl: -2.6031, zA: 44.9447, zB: 13.2409, angle: 31.7038, distanceKm: 3514.551, nameA: 'Boston', nameB: 'Maracaibo' });
+
+// ---------- demo ----------
+const PRESETS = [
+  { nameA: 'Boston', nameB: 'Maracaibo', a: { lat: 42.35843, lon: -71.05977 }, b: { lat: 10.6423, lon: -71.6109 }, date: '2026-09-29', refraction: true, distMode: 'ns' },
+  { nameA: '30°N', nameB: '45°N', a: { lat: 30, lon: -80 }, b: { lat: 45, lon: -80 }, date: '2026-03-20', refraction: false, distMode: 'ns' },
+  { nameA: '20°S', nameB: '40°N', a: { lat: -20, lon: 20 }, b: { lat: 40, lon: 20 }, date: '2026-09-29', refraction: false, distMode: 'ns' },
+  { nameA: 'Boston', nameB: 'Miami', a: { lat: 42.36, lon: -71.06 }, b: { lat: 25.77, lon: -80.19 }, date: '2026-06-21', refraction: true, distMode: 'straight' },
+];
+const $ = (id) => document.getElementById(id);
+let names = { nameA: 'Boston', nameB: 'Maracaibo' };
+
+function applyPreset(i) {
+  const p = PRESETS[i];
+  $('latA').value = p.a.lat; $('lonA').value = p.a.lon;
+  $('latB').value = p.b.lat; $('lonB').value = p.b.lon; $('latBr').value = p.b.lat;
+  $('date').value = p.date; $('refraction').checked = p.refraction;
+  document.querySelector(`input[name=dist][value=${p.distMode}]`).checked = true;
+  names = { nameA: p.nameA, nameB: p.nameB };
+  document.querySelectorAll('.presets button').forEach((b) => b.setAttribute('aria-pressed', String(+b.dataset.p === i)));
+  run();
+}
+
+function readInputs() {
+  const n = (id) => parseFloat($(id).value);
+  const a = { lat: n('latA'), lon: n('lonA') }, b = { lat: n('latB'), lon: n('lonB') };
+  const date = $('date').value;
+  const bad = [];
+  for (const [k, v] of [['City A latitude', a.lat], ['City B latitude', b.lat]]) if (!(v >= -90 && v <= 90)) bad.push(`${k} must be between −90 and 90.`);
+  for (const [k, v] of [['City A longitude', a.lon], ['City B longitude', b.lon]]) if (!(v >= -180 && v <= 180)) bad.push(`${k} must be between −180 and 180.`);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) bad.push('Choose a date.');
+  return { a, b, date, refraction: $('refraction').checked, distMode: document.querySelector('input[name=dist]:checked').value, bad };
+}
+
+const sgn = (n) => (n > 0 ? '+' : n < 0 ? '−' : '');
+const esc = (s) => String(s).replace(/[&<>"']/g, (ch) => `&#${ch.charCodeAt(0)};`);
+
+function run() {
+  const out = $('demo-out');
+  const inp = readInputs();
+  if (inp.bad.length) { out.innerHTML = `<ul class="warnings">${inp.bad.map((t) => `<li>${t}</li>`).join('')}</ul>`; return; }
+  const { a, b } = inp;
+  let m;
+  try { m = measure(a, b, inp); } catch (err) { out.innerHTML = `<p class="status">Could not compute: ${esc(err.message)}</p>`; return; }
+  const { sunA, sunB, dist, arc, distanceKm, C } = m;
+  const nameA = names.nameA || 'City A', nameB = names.nameB || 'City B';
+
+  // warnings, same thresholds as src/main.js (time-zone check omitted: the demo has no time zones)
+  const warnings = [];
+  const absDLon = Math.abs(dist.dLon);
+  if (absDLon > 3) warnings.push(`The cities are ${absDLon.toFixed(1)}° apart in longitude, which is not really north–south.`);
+  else if (absDLon > 1) warnings.push(`The cities are ${absDLon.toFixed(1)}° apart in longitude. The closer to 0°, the better.`);
+  if (inp.distMode === 'straight' && dist.straightKm > dist.northSouthKm * 1.005) {
+    warnings.push(`The straight-line distance is ${((dist.straightKm / dist.northSouthKm - 1) * 100).toFixed(1)}% longer than the north–south distance. The Sun angle only measures north–south separation, so this inflates the circumference by the same amount.`);
+  }
+  if (Math.abs(dist.dLat) < 2) warnings.push(`Only ${Math.abs(dist.dLat).toFixed(2)}° of latitude apart. Small angles magnify any measurement error.`);
+  for (const [n, s] of [[nameA, sunA], [nameB, sunB]]) if (s.altitude < 0) warnings.push(`At ${esc(n)} the Sun is below the horizon even at noon (polar night).`);
+  if (!arc.sameSide) warnings.push('The noon Sun is <strong>south</strong> of one city and <strong>north</strong> of the other, so step 10 adds the zenith angles instead of subtracting altitudes.');
+
+  const dir = (s) => (Math.cos((s.azimuth * Math.PI) / 180) < 0 ? 'south' : 'north');
+  const step9 = (s) => { const { d, m: mm, s: sec, sign } = toDMS(s.altitude, 1); return `${sign < 0 ? '−' : ''}${d} + ${mm}/60 + ${sec.toFixed(1)}/3600 = <strong>${s.altitude.toFixed(4)}°</strong>`; };
+  let step10;
+  if (arc.sameSide) {
+    const [hi, lo] = [sunA.altitude, sunB.altitude].sort((x, y) => y - x);
+    step10 = `${hi.toFixed(4)}° − ${lo.toFixed(4)}° → angle = <strong>${arc.angle.toFixed(4)}°</strong>`;
+  } else {
+    step10 = `(90° − ${sunA.altitude.toFixed(4)}°) + (90° − ${sunB.altitude.toFixed(4)}°) = ${Math.abs(arc.zA).toFixed(4)}° + ${Math.abs(arc.zB).toFixed(4)}° → angle = <strong>${arc.angle.toFixed(4)}°</strong>`;
+  }
+  const errEq = percentError(C, EARTH_EQUATORIAL_KM), errMer = percentError(C, EARTH_MERIDIONAL_KM);
+  const utc = (d) => d.toISOString().slice(11, 19) + ' UTC';
+  const ok = Number.isFinite(C);
+
+  out.innerHTML = `
+    <div class="answer">
+      <div><div style="font-size:.85rem;color:var(--muted)">Circumference, ${esc(nameA)} → ${esc(nameB)}, ${inp.date}</div>
+      <div class="big" id="demo-C" data-c="${ok ? C.toFixed(2) : 'NaN'}">${ok ? fmt(C) : '—'} <small>km</small></div></div>
+    </div>
+    <div class="errs">
+      <div><span>vs equator 40,075 km</span><strong id="demo-err">${ok ? sgn(errEq) + Math.abs(errEq).toFixed(2) + '%' : '—'}</strong></div>
+      <div><span>vs pole-to-pole 40,008 km</span><strong>${ok ? sgn(errMer) + Math.abs(errMer).toFixed(2) + '%' : '—'}</strong></div>
+      <div><span>Distance used (${inp.distMode === 'ns' ? 'north–south' : 'straight line'})</span><strong>${fmt(distanceKm, 1)} km</strong></div>
+      <div><span>Other distance (${inp.distMode === 'ns' ? 'straight line' : 'north–south'})</span><strong>${fmt(inp.distMode === 'ns' ? dist.straightKm : dist.northSouthKm, 1)} km</strong></div>
+    </div>
+    ${warnings.length ? `<ul class="warnings">${warnings.map((t) => `<li>${t}</li>`).join('')}</ul>` : ''}
+    <div class="table-wrap">
+      <table class="suntable">
+        <caption class="sr" style="text-align:left;font-size:.85rem;color:var(--muted);padding-bottom:6px">Sun at local solar noon</caption>
+        <thead><tr><th scope="col"></th><th scope="col">Solar noon</th><th scope="col">Altitude (DMS)</th><th scope="col">Decimal</th><th scope="col">Sun is</th></tr></thead>
+        <tbody>
+          ${[[nameA, sunA], [nameB, sunB]].map(([n, s]) => `<tr><th scope="row">${esc(n)}</th><td class="mono">${utc(s.time)}</td><td class="mono">${formatDMS(s.altitude)}</td><td class="mono">${s.altitude.toFixed(4)}°</td><td>due ${dir(s)}</td></tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+    <ol class="worksheet" aria-label="Worksheet steps 9 to 11">
+      <li><b>Step 9 · DMS to decimal degrees</b>${esc(nameA)}: ${step9(sunA)}<br>${esc(nameB)}: ${step9(sunB)}</li>
+      <li><b>Step 10 · Angle of the arc of the Earth</b>${step10}</li>
+      <li><b>Step 11 · The proportion</b>360° / ${arc.angle.toFixed(4)}° = C / ${fmt(distanceKm, 1)} km<br>C = 360 × ${fmt(distanceKm, 1)} / ${arc.angle.toFixed(4)} ≈ <strong>${ok ? fmt(C) + ' km' : 'undefined (angle is 0)'}</strong></li>
+    </ol>`;
+
+  drawGeometry({ latA: a.lat, latB: b.lat, decl: sunA.declination, zA: arc.zA, zB: arc.zB, angle: arc.angle, distanceKm, nameA, nameB });
+  $('geo-cap').textContent = `Schematic cross-section for ${nameA} → ${nameB} on ${inp.date} (latitudes to scale, Earth drawn as a circle).`;
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  // math typesetting
+  if (window.katex) document.querySelectorAll('[data-tex]').forEach((el) => {
+    try { katex.render(el.dataset.tex, el, { displayMode: true, throwOnError: false }); } catch { /* keep the plain-text fallback */ }
+  });
+  if (window.hljs) document.querySelectorAll('pre code').forEach((el) => hljs.highlightElement(el));
+
+  document.querySelectorAll('.presets button').forEach((b) => b.addEventListener('click', () => applyPreset(+b.dataset.p)));
+  const custom = () => {
+    names = { nameA: 'City A', nameB: 'City B' };
+    document.querySelectorAll('.presets button').forEach((b) => b.setAttribute('aria-pressed', 'false'));
+    run();
+  };
+  ['latA', 'lonA', 'latB', 'lonB', 'date'].forEach((id) => $(id).addEventListener('input', () => {
+    if (id === 'latB') $('latBr').value = $('latB').value;
+    custom();
+  }));
+  $('latBr').addEventListener('input', () => { $('latB').value = $('latBr').value; custom(); });
+  $('refraction').addEventListener('change', run);
+  document.querySelectorAll('input[name=dist]').forEach((r) => r.addEventListener('change', run));
+
+  if (window.Astronomy && window.geodesic) {
+    applyPreset(0);
+  } else {
+    $('demo-out').innerHTML = `<p class="status">The live demo needs Astronomy Engine and GeographicLib from jsDelivr, which didn't load (are you offline?).
+      Here is the verified result for the default inputs instead:</p>
+      <ul class="worksheet"><li><b>Boston (42.35843, −71.05977) → Maracaibo (10.6423, −71.6109), 2026-09-29, atmosphere on</b>
+      Altitudes 45.0553° and 76.7591°, both due south<br>angle = 76.7591° − 45.0553° = 31.7038°<br>
+      C = 360 × 3,514.6 / 31.7038 ≈ <strong>39,908 km</strong> (−0.42% vs 40,075 km)</li></ul>`;
+    applyPresetFieldsOnly(0);
+  }
+});
+function applyPresetFieldsOnly(i) {
+  const p = PRESETS[i];
+  $('latA').value = p.a.lat; $('lonA').value = p.a.lon; $('latB').value = p.b.lat; $('lonB').value = p.b.lon; $('latBr').value = p.b.lat;
+  $('date').value = p.date; $('refraction').checked = p.refraction;
+  document.querySelector(`input[name=dist][value=${p.distMode}]`).checked = true;
+}
+</script>
+</body>
+</html>
